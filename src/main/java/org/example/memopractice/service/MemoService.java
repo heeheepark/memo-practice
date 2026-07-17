@@ -1,7 +1,6 @@
 package org.example.memopractice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.memopractice.MemoPracticeApplication;
 import org.example.memopractice.dto.*;
 import org.example.memopractice.entity.Memo;
 import org.example.memopractice.repository.MemoRepository;
@@ -19,7 +18,8 @@ public class MemoService {
     @Transactional
     public MemoCreateResponse create(MemoCreateRequest request) {
         Memo memo = new Memo(request.getContent());
-        return new MemoCreateResponse(memo.getId(), memo.getContent());
+        Memo saveMemo = memoRepository.save(memo);
+        return new MemoCreateResponse(saveMemo.getId(), saveMemo.getContent(), saveMemo.getCreatedAt(), saveMemo.getModifiedAt());
     }
 
     @Transactional
@@ -28,7 +28,7 @@ public class MemoService {
         List<MemoGetResponse> dtos = new ArrayList<>();
 
         for (Memo memo : memos) {
-            dtos.add(new MemoGetResponse(memo.getId(), memo.getContent()));
+            dtos.add(new MemoGetResponse(memo.getId(), memo.getContent(), memo.getCreatedAt(), memo.getModifiedAt()));
         }
 
         return dtos;
@@ -40,7 +40,7 @@ public class MemoService {
                 () -> new IllegalArgumentException("해당 메모가 없습니다.")
         );
 
-        return new MemoGetResponse(memo.getId(), memo.getContent());
+        return new MemoGetResponse(memo.getId(), memo.getContent(), memo.getCreatedAt(), memo.getModifiedAt());
     }
 
     @Transactional
@@ -50,7 +50,7 @@ public class MemoService {
         );
 
         memo.update(request.getContent());
-        return new MemoUpdateResponse(memo.getId(), memo.getContent());
+        return new MemoUpdateResponse(memo.getId(), memo.getContent(), memo.getCreatedAt(), memo.getModifiedAt());
     }
 
     public void delete(Long memoId) {
